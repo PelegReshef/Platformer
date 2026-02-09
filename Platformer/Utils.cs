@@ -1,4 +1,6 @@
-﻿namespace Platformer
+﻿using System.Runtime.InteropServices;
+
+namespace Platformer
 {
     public struct Vector2
     {
@@ -38,9 +40,83 @@
             Right,
             Back
         }
-        public static List<InputType> GetInput()
+        public enum InputListType
         {
-            throw new NotImplementedException();
+            movement,
+            navigation,
+        }
+        private static readonly ConsoleKey[] movementKeys = 
+        {
+            ConsoleKey.W,
+            ConsoleKey.UpArrow,
+            ConsoleKey.A,
+            ConsoleKey.LeftArrow,
+            ConsoleKey.S,
+            ConsoleKey.DownArrow,
+            ConsoleKey.D,
+            ConsoleKey.RightArrow,
+        };
+        private static readonly ConsoleKey[] navKeys = 
+        {
+            ConsoleKey.UpArrow,
+            ConsoleKey.DownArrow,
+        };
+        // calling user32 for better input detection
+        [DllImport("user32.dll")]
+        private static extern short GetAsyncKeyState(int vKey);
+        public static List<InputType> GetInput(InputListType ilt)
+        {
+            List<InputType> inputList = new List<InputType>();
+            switch (ilt)
+            {
+                case InputListType.movement:
+                    for (int i = 0; i < movementKeys.Length; i++)
+                    {
+                        if ((GetAsyncKeyState((int)movementKeys[i]) & 0x8000) != 0)
+                        {
+                            switch (i + 1)
+                            {
+                                case 1:
+                                case 2:
+                                    inputList.Add(InputType.Up);
+                                    break;
+                                case 3:
+                                case 4:
+                                    inputList.Add(InputType.Left);
+                                    break;
+                                case 5:
+                                case 6:
+                                    inputList.Add(InputType.Down);
+                                    break;
+                                case 7:
+                                case 8:
+                                    inputList.Add(InputType.Right);
+                                    break;
+                            }
+                        }
+                    }
+                    break;
+
+                case InputListType.navigation:
+                    for (int i = 0; i <= movementKeys.Length; i++)
+                    {
+                        if ((GetAsyncKeyState((int)movementKeys[i]) & 0x8000) != 0)
+                        {
+                            switch (i + 1)
+                            {
+                                case 1:
+                                    inputList.Add(InputType.Up);
+                                    break;
+
+                                case 2:
+                                    inputList.Add(InputType.Down);
+                                    break;
+                            }
+                        }
+                    }
+                    break;
+            }
+            return inputList; 
             
 
         }
