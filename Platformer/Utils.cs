@@ -98,7 +98,7 @@ namespace Platformer
                     break;
 
                 case InputListType.navigation:
-                    for (int i = 0; i <= movementKeys.Length; i++)
+                    for (int i = 0; i < movementKeys.Length; i++)
                     {
                         if ((GetAsyncKeyState((int)movementKeys[i]) & 0x8000) != 0)
                         {
