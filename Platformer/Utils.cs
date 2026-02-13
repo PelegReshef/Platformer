@@ -1,51 +1,143 @@
-﻿using System.Runtime.InteropServices;
+﻿using System;
+using System.Runtime.InteropServices;
 
 namespace Platformer
 {
     public struct Vector2
     {
-        public double x;
-        public double y;
+        public float x;
+        public float y;
 
-        public Vector2(double x, double y)
+        public Vector2(float x, float y)
         {
             this.x = x;
             this.y = y;
         }
-        public double Length()
+
+
+        // legnths
+        public float Length()
         {
-            return Math.Sqrt(x * x + y * y);
+            return MathF.Sqrt(x * x + y * y);
         }
+        public float LegnthSquared()
+        {
+            return x * x + y * y;
+        }
+
+        // normalization
         public Vector2 Normalized()
         {
-            return this.Divided(Length());
+            if (LegnthSquared() == 0)
+            {
+                return Zero();
+            }
+            return this / Length();
         }
-        public Vector2 Multiplied(double num)
+        //public Vector2 Multiplied(float num)
+        //{
+        //    return new Vector2(num * x, num * y);
+        //}
+        //public Vector2 Divided(float num)
+        //{
+        //    return new Vector2(num / x, num / y);
+        //}
+
+
+        // multipication
+        public static Vector2 operator *(Vector2 vec, float a)
         {
-            return new Vector2(num * x, num * y);
+            return new Vector2(vec.x * a, vec.y * a);
         }
-        public Vector2 Divided(double num)
+        public static Vector2 operator *(float a, Vector2 vec)
         {
-            return new Vector2(num / x, num / y);
+            return new Vector2(vec.x * a, vec.y * a);
+        }
+        public static Vector2 operator *(Vector2 vec1, Vector2 vec2)
+        {
+            return new Vector2(vec1.x * vec2.x, vec1.y * vec2.y);
+        }
+
+
+        // division
+        public static Vector2 operator /(Vector2 vec, float a)
+        {
+            if (a == 0)
+            {
+                throw new DivideByZeroException();
+            }
+            return new Vector2(vec.x / a, vec.y / a);
+        }
+        public static Vector2 operator /(Vector2 vec1, Vector2 vec2)
+        {
+            if (vec2.x == 0 || vec2.y == 0) // cant divide a vector with a zero in it
+            {
+                throw new DivideByZeroException("cant divide by a vector that one of its values it zero");
+            }
+            return new Vector2(vec1.x / vec2.x, vec1.y / vec2.y);
+        }
+
+
+        // addition
+        public static Vector2 operator +(Vector2 vec, float a)
+        {
+            return new Vector2(vec.x + a, vec.y + a);
+        }
+        public static Vector2 operator +(float a, Vector2 vec)
+        {
+            return new Vector2(vec.x + a, vec.y + a);
+        }
+        public static Vector2 operator +(Vector2 vec1, Vector2 vec2)
+        {
+            return new Vector2(vec1.x + vec2.x, vec1.y + vec2.y);
+        }
+
+
+        // subtraction
+        public static Vector2 operator -(Vector2 vec, float a)
+        {
+            return new Vector2(vec.x - a, vec.y - a);
+        }
+        public static Vector2 operator -(Vector2 vec1, Vector2 vec2)
+        {
+            return new Vector2(vec1.x - vec2.x, vec1.y - vec2.y);
+        }
+
+
+
+        public static Vector2 Zero()
+        {
+            return new Vector2(0, 0);
         }
     }
     public static class InputManager
     {
         public enum InputType
         {
-            None,
             Up,
             Down,
             Left,
             Right,
             Back
         }
-        public enum InputListType
+        private static readonly Dictionary<ConsoleKey, InputType> consoleKeyToInputType = new()
         {
-            movement,
-            navigation,
-        }
-        private static readonly ConsoleKey[] movementKeys = 
+            [ConsoleKey.W] = InputType.Up,
+            [ConsoleKey.UpArrow] = InputType.Up,
+
+            [ConsoleKey.A] = InputType.Left,
+            [ConsoleKey.LeftArrow] = InputType.Left,
+
+            [ConsoleKey.D] = InputType.Right,
+            [ConsoleKey.RightArrow] = InputType.Right,
+
+            [ConsoleKey.S] = InputType.Down,
+            [ConsoleKey.DownArrow] = InputType.Down,
+
+            [ConsoleKey.Escape] = InputType.Back,
+
+        };
+        private static readonly ConsoleKey[] allowedKeys = 
         {
             ConsoleKey.W,
             ConsoleKey.UpArrow,
@@ -55,70 +147,24 @@ namespace Platformer
             ConsoleKey.DownArrow,
             ConsoleKey.D,
             ConsoleKey.RightArrow,
-        };
-        private static readonly ConsoleKey[] navKeys = 
-        {
-            ConsoleKey.UpArrow,
-            ConsoleKey.DownArrow,
+            ConsoleKey.Escape,
         };
         // calling user32 for better input detection
         [DllImport("user32.dll")]
         private static extern short GetAsyncKeyState(int vKey);
-        public static List<InputType> GetInput(InputListType ilt)
+        public static HashSet<InputType> GetInput()
         {
-            List<InputType> inputList = new List<InputType>();
-            switch (ilt)
+            HashSet<InputType> inputList = new HashSet<InputType>();
+            
+            for (int i = 0; i < allowedKeys.Length; i++)
             {
-                case InputListType.movement:
-                    for (int i = 0; i < movementKeys.Length; i++)
-                    {
-                        if ((GetAsyncKeyState((int)movementKeys[i]) & 0x8000) != 0)
-                        {
-                            switch (i + 1)
-                            {
-                                case 1:
-                                case 2:
-                                    inputList.Add(InputType.Up);
-                                    break;
-                                case 3:
-                                case 4:
-                                    inputList.Add(InputType.Left);
-                                    break;
-                                case 5:
-                                case 6:
-                                    inputList.Add(InputType.Down);
-                                    break;
-                                case 7:
-                                case 8:
-                                    inputList.Add(InputType.Right);
-                                    break;
-                            }
-                        }
-                    }
-                    break;
-
-                case InputListType.navigation:
-                    for (int i = 0; i < movementKeys.Length; i++)
-                    {
-                        if ((GetAsyncKeyState((int)movementKeys[i]) & 0x8000) != 0)
-                        {
-                            switch (i + 1)
-                            {
-                                case 1:
-                                    inputList.Add(InputType.Up);
-                                    break;
-
-                                case 2:
-                                    inputList.Add(InputType.Down);
-                                    break;
-                            }
-                        }
-                    }
-                    break;
+                if ((GetAsyncKeyState((int)allowedKeys[i]) & 0x8000) != 0) // key is pressed
+                {
+                    InputType input = consoleKeyToInputType[allowedKeys[i]]; // get input type from a dictionary
+                    inputList.Add(input);
+                }
             }
             return inputList; 
-            
-
         }
     }
 
