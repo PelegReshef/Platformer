@@ -20,13 +20,13 @@ namespace Platformer
             //bool atCornerX = false;
             //bool atCornerY = false;
 
-            Object[] dvds = new Object[10];
+            Object[] dvds = new Object[100];
 
             for (int i = 0; i < dvds.Length; i++)
             {
                 float rndAngle = (float)rnd.NextDouble() * MathF.PI * 2f;
                 Vector2 rndDir = new Vector2(MathF.Cos(rndAngle), MathF.Sin(rndAngle));
-                dvds[i] = new Object(new Vector2(2, 2), new Vector2(30, 30));
+                dvds[i] = new Object(new Vector2(31f), new Vector2(30, 30));
                 dvds[i].dir =  rndDir;
                 dvds[i].speed = rnd.Next(200, 401);
             }
