@@ -13,20 +13,15 @@ namespace Platformer
             rect.speed = 400;
             Raylib.InitWindow(1080, 540, "jkjkkjkjjk");
 
-            //Object dvds[i] = new Object(new Vector2(1, 1), new Vector2(30, 30));
-            //dvds[i].speed = 300;
-            //dvds[i].dir = Vector2.Normalize(new Vector2(1.1f, 1));
-
-            //bool atCornerX = false;
-            //bool atCornerY = false;
-
-            Object[] dvds = new Object[100];
+            Object[] dvds = new Object[1];
+            Console.WriteLine("start");
+            Console.WriteLine("---------");
 
             for (int i = 0; i < dvds.Length; i++)
             {
                 float rndAngle = (float)rnd.NextDouble() * MathF.PI * 2f;
                 Vector2 rndDir = new Vector2(MathF.Cos(rndAngle), MathF.Sin(rndAngle));
-                dvds[i] = new Object(new Vector2(31f), new Vector2(30, 30));
+                dvds[i] = new Object(new Vector2(0f), new Vector2(30, 30));
                 dvds[i].dir =  rndDir;
                 dvds[i].speed = rnd.Next(200, 401);
             }
@@ -72,7 +67,7 @@ namespace Platformer
                     {
                         dvds[i].dir = Vector2.Normalize(new Vector2(-dvds[i].dir.X, dvds[i].dir.Y));
                         dvds[i].atCornerX = true;
-                        //Console.WriteLine("x: " + atCornerX);
+                        Console.WriteLine("x collision");
                     }
                     else 
                         dvds[i].atCornerX = false;
@@ -82,7 +77,7 @@ namespace Platformer
                     {
                         dvds[i].dir = Vector2.Normalize(new Vector2(dvds[i].dir.X, -dvds[i].dir.Y));
                         dvds[i].atCornerY = true;
-                        //Console.WriteLine("y: " + atCornerY);
+                        Console.WriteLine("y: collision");
                     }
                     else 
                         dvds[i].atCornerY = false;
@@ -95,8 +90,12 @@ namespace Platformer
                         lost = true;
                         break;
                     }
+                    Color color = Color.FromHSV((dvds[i].pos.Y/ 540.0f) * 255f , 1, 1);
+                    //Console.WriteLine("pos: " + dvds[i].pos.Y / 540f);
 
-                    Raylib.DrawRectangle((int)dvds[i].pos.X, (int)dvds[i].pos.Y, (int)dvds[i].size.X, (int)dvds[i].size.Y, Color.Blue);
+                    //Console.WriteLine("dir: " + dvds[i].dir);
+                    //Console.WriteLine(dvds[i].pos);
+                    Raylib.DrawRectangle((int)dvds[i].pos.X, (int)dvds[i].pos.Y, (int)dvds[i].size.X, (int)dvds[i].size.Y, color);
                 }
                 if (lost)
                 {
@@ -140,17 +139,7 @@ namespace Platformer
 
         public bool GetCollision(Vector2 pos, Vector2 size)
         {
-            //bool inX = ((pos.X >= this.pos.X) && (pos.X <= (this.pos.X + this.size.X)));
-            //bool inY = ((pos.Y >= this.pos.Y) && (pos.Y <= (this.pos.Y + this.size.Y)));
-            //if (inX)
-            //{
-            //    Console.WriteLine("collide X");
-            //}
-            //if (inY)
-            //{
-            //    Console.WriteLine("collide Y");
-            //}
-            return
+            return // use AABB collision detection
                 this.pos.X < pos.X + size.X &&
                 this.pos.X + this.size.X > pos.X &&
 
