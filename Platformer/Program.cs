@@ -12,8 +12,9 @@ namespace Platformer
             Object rect = new Object(new Vector2(540, 270), new Vector2(30, 30));
             rect.speed = 400;
             Raylib.InitWindow(1080, 540, "jkjkkjkjjk");
+            Raylib.SetTargetFPS(60);
 
-            Object[] dvds = new Object[1];
+            Object[] dvds = new Object[20];
             Console.WriteLine("start");
             Console.WriteLine("---------");
 
@@ -21,7 +22,7 @@ namespace Platformer
             {
                 float rndAngle = (float)rnd.NextDouble() * MathF.PI * 2f;
                 Vector2 rndDir = new Vector2(MathF.Cos(rndAngle), MathF.Sin(rndAngle));
-                dvds[i] = new Object(new Vector2(0f), new Vector2(30, 30));
+                dvds[i] = new Object(new Vector2(1f), new Vector2(30, 30));
                 dvds[i].dir =  rndDir;
                 dvds[i].speed = rnd.Next(200, 401);
             }
@@ -63,24 +64,24 @@ namespace Platformer
                 for (int i = 0; i < dvds.Length; i++)
                 {
                     
-                    if ((dvds[i].pos.X < 0.01 || dvds[i].pos.X > 1049.99) && (!dvds[i].atCornerX))   // reaches right and left sizes
+                    if ((dvds[i].pos.X < 0.01 || dvds[i].pos.X > 1050) && (!dvds[i].atCornerX))   // reaches right and left sizes
                     {
                         dvds[i].dir = Vector2.Normalize(new Vector2(-dvds[i].dir.X, dvds[i].dir.Y));
                         dvds[i].atCornerX = true;
-                        Console.WriteLine("x collision");
+                        //Console.WriteLine("x collision");
                     }
                     else 
-                        dvds[i].atCornerX = false;
+                        dvds[i].atCornerX = false; //Console.WriteLine("x");
 
 
-                    if ((dvds[i].pos.Y < 0.01 || dvds[i].pos.Y > 509.99) && (!dvds[i].atCornerY)) // reaches top and bottom sides
+                    if ((dvds[i].pos.Y < 0.01 || dvds[i].pos.Y > 510) && (!dvds[i].atCornerY)) // reaches top and bottom sides
                     {
                         dvds[i].dir = Vector2.Normalize(new Vector2(dvds[i].dir.X, -dvds[i].dir.Y));
                         dvds[i].atCornerY = true;
-                        Console.WriteLine("y: collision");
+                        //Console.WriteLine("y collision");
                     }
                     else 
-                        dvds[i].atCornerY = false;
+                        dvds[i].atCornerY = false; //Console.WriteLine("y");
                 
                     dvds[i].Move();
 
